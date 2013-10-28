@@ -49,11 +49,16 @@ def compute_score(sent, sents):
     return sum(compare_sents_bounded(sent, sent1) for sent1 in sents) / float(len(sents))
 
 
-def summarize_block(block):
-    """Return the sentence that best summarizes block"""
+def summarize_block(block, N=None):
+    """Return the sentence that best summarizes block by default. N is
+    optionally specified to return the top N sentences in order of
+    relevance."""
     sents = nltk.sent_tokenize(block)
     word_sents = map(nltk.word_tokenize, sents)
     d = dict((compute_score(word_sent, word_sents), sent) for sent, word_sent in zip(sents, word_sents))
+    if N is not None:
+        d_sorted = sorted(d.items(), key=lambda x: x[0], reverse=True)
+        return ' '.join([item[1] for item in d_sorted[:N]])
     return d[max(d.keys())]
 
 
